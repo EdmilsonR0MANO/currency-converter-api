@@ -1,0 +1,266 @@
+{
+  "info": {
+    "_postman_id": "currency-converter-api",
+    "name": "Currency Converter API",
+    "description": "API de Conversão Monetária - Coleção de requisições para teste",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "apiKey",
+      "value": "sua-api-key-aqui",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "health"]
+        },
+        "description": "Verifica se a API está funcionando"
+      },
+      "response": []
+    },
+    {
+      "name": "Converter Moeda (GET)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "x-api-key",
+            "value": "{{apiKey}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/conversion/convert?from=USD&to=BRL&amount=100",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "conversion", "convert"],
+          "query": [
+            {
+              "key": "from",
+              "value": "USD",
+              "description": "Moeda de origem"
+            },
+            {
+              "key": "to",
+              "value": "BRL",
+              "description": "Moeda de destino"
+            },
+            {
+              "key": "amount",
+              "value": "100",
+              "description": "Valor a ser convertido"
+            }
+          ]
+        },
+        "description": "Converte um valor de uma moeda para outra usando query parameters"
+      },
+      "response": []
+    },
+    {
+      "name": "Converter Moeda (POST)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "x-api-key",
+            "value": "{{apiKey}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"from\": \"USD\",\n  \"to\": \"BRL\",\n  \"amount\": 100\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/conversion/convert",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "conversion", "convert"]
+        },
+        "description": "Converte um valor de uma moeda para outra usando corpo da requisição"
+      },
+      "response": []
+    },
+    {
+      "name": "Converter EUR para USD",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "x-api-key",
+            "value": "{{apiKey}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"from\": \"EUR\",\n  \"to\": \"USD\",\n  \"amount\": 50\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/conversion/convert",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "conversion", "convert"]
+        },
+        "description": "Exemplo de conversão de Euro para Dólar"
+      },
+      "response": []
+    },
+    {
+      "name": "Converter BTC para BRL",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "x-api-key",
+            "value": "{{apiKey}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"from\": \"BTC\",\n  \"to\": \"BRL\",\n  \"amount\": 0.5\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/conversion/convert",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "conversion", "convert"]
+        },
+        "description": "Exemplo de conversão de Bitcoin para Real"
+      },
+      "response": []
+    },
+    {
+      "name": "Listar Moedas Suportadas",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "x-api-key",
+            "value": "{{apiKey}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/conversion/currencies",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "conversion", "currencies"]
+        },
+        "description": "Retorna a lista de todas as moedas suportadas"
+      },
+      "response": []
+    },
+    {
+      "name": "Erro - Moeda Inválida",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "x-api-key",
+            "value": "{{apiKey}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"from\": \"XXX\",\n  \"to\": \"BRL\",\n  \"amount\": 100\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/conversion/convert",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "conversion", "convert"]
+        },
+        "description": "Teste de erro com moeda inválida"
+      },
+      "response": []
+    },
+    {
+      "name": "Erro - Valor Negativo",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "x-api-key",
+            "value": "{{apiKey}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"from\": \"USD\",\n  \"to\": \"BRL\",\n  \"amount\": -100\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/conversion/convert",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "conversion", "convert"]
+        },
+        "description": "Teste de erro com valor negativo"
+      },
+      "response": []
+    },
+    {
+      "name": "Erro - Sem API Key",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/conversion/convert?from=USD&to=BRL&amount=100",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "conversion", "convert"],
+          "query": [
+            {
+              "key": "from",
+              "value": "USD"
+            },
+            {
+              "key": "to",
+              "value": "BRL"
+            },
+            {
+              "key": "amount",
+              "value": "100"
+            }
+          ]
+        },
+        "description": "Teste de erro sem API Key"
+      },
+      "response": []
+    }
+  ]
+}
