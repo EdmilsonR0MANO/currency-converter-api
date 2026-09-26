@@ -21,6 +21,7 @@
     "generate:key": "node scripts/generate-api-key.js"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.128.0",
     "@nestjs/axios": "^3.0.2",
     "@nestjs/cache-manager": "^2.2.0",
     "@nestjs/common": "^10.3.0",

@@ -31,6 +31,7 @@ async function bootstrap() {
       - Cotações em tempo real via AwesomeAPI
       - Cache de 2 minutos para otimização
       - Indicação de origem dos dados (API ou Cache)
+      - Assistente em linguagem natural (Claude com function calling)
     `,
     )
     .setVersion('1.0')
@@ -44,6 +45,7 @@ async function bootstrap() {
       'api-key',
     )
     .addTag('conversion', 'Endpoints de conversão monetária')
+    .addTag('assistant', 'Perguntas em linguagem natural (IA)')
     .addTag('health', 'Health check da aplicação')
     .build();
 

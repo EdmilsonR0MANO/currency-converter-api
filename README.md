@@ -16,6 +16,7 @@ API RESTful para conversão de moedas em tempo real, desenvolvida em **Node.js**
 - [Execução](#-execução)
 - [Documentação da API](#-documentação-da-api)
 - [Exemplos de Uso](#-exemplos-de-uso)
+- [Assistente em linguagem natural (IA)](#-assistente-em-linguagem-natural-ia)
 - [Testes](#-testes)
 - [Estrutura do Projeto](#-estrutura-do-projeto)
 
@@ -38,6 +39,7 @@ API RESTful para conversão de moedas em tempo real, desenvolvida em **Node.js**
 - [x] **Sistema de Cache** - TTL de 2 minutos para otimização
 - [x] **Indicação de origem** - Resposta indica se dados vêm do cache ou API
 - [x] **Coleção Postman** - Exemplos prontos para importar e testar
+- [x] **Assistente em linguagem natural (IA)** - pergunte "quanto dá 250 dólares em reais?" e o Claude chama a conversão desta API por function calling ([detalhes](#-assistente-em-linguagem-natural-ia))
 
 ---
 
@@ -211,6 +213,60 @@ Importe a coleção disponível em `postman/Currency-Converter-API.postman_colle
 
 ---
 
+## 🤖 Assistente em linguagem natural (IA)
+
+`POST /api/assistant/ask` recebe uma pergunta em português e responde com o valor convertido. O modelo (Claude) **não faz a conta**: ele interpreta a pergunta, chama a ferramenta `convert_currency` desta API (*function calling*) e redige a resposta com o resultado que o `ConversionService` devolveu, com cotação real e o mesmo cache.
+
+```bash
+curl -X POST http://localhost:3000/api/assistant/ask \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: sua-api-key" \
+  -d '{"question": "Quanto dá 250 dólares em reais?"}'
+```
+
+```json
+{
+  "answer": "250 dólares dão R$ 1.346,25, com a cotação de 5,385.",
+  "conversions": [
+    { "from": "USD", "to": "BRL", "originalAmount": 250, "convertedAmount": 1346.25, "exchangeRate": 5.385, "fromCache": false, "timestamp": "2026-09-26T18:00:00.000Z" }
+  ],
+  "model": "claude-opus-5"
+}
+```
+
+`conversions` traz os números que a API calculou, para conferir a resposta do modelo.
+
+### Como funciona
+
+1. A pergunta vai para o modelo com uma ferramenta, `convert_currency(from, to, amount)`.
+2. O modelo pede a conversão (uma ou várias no mesmo turno, como em "100 euros em dólar e em libra").
+3. `AssistantService` executa cada pedido no `ConversionService` e devolve os resultados numa única mensagem.
+4. O modelo responde em até duas frases. O laço tem limite de 5 rodadas.
+
+### Decisões
+
+- **O modelo não calcula nem inventa cotação.** O prompt de sistema proíbe, e o número exibido sai de `conversions`.
+- **`strict: true` e `enum` com as moedas suportadas**: o modelo só consegue chamar a ferramenta com os três campos e com códigos que a API conhece. "Dólar" vira `USD` pela descrição da ferramenta.
+- **A entrada do modelo é validada de novo** no serviço (valor positivo, moedas válidas). Erro de conversão volta ao modelo como `tool_result` com `is_error`, e ele explica ao usuário em vez de a API devolver 500.
+- **Sem `ANTHROPIC_API_KEY`**, o resto da API continua funcionando e só o assistente responde 503.
+- **Erros da API do Claude** viram respostas HTTP claras: 503 para chave inválida, 429 para limite de uso e 502 para o resto.
+- **Esforço baixo** (`ASSISTANT_EFFORT=low`), porque é uma pergunta curta com uma ferramenta, e **fallback do servidor** (`fallbacks: "default"`) caso o modelo recuse por política.
+
+### Configuração
+
+| Variável | Padrão | Para quê |
+|---|---|---|
+| `ANTHROPIC_API_KEY` | vazio | Chave da API do Claude. Sem ela, `/api/assistant/ask` responde 503 |
+| `ASSISTANT_MODEL` | `claude-opus-5` | Modelo usado |
+| `ASSISTANT_EFFORT` | `low` | `low`, `medium` ou `high`. Deixe vazio em modelos que não aceitam o parâmetro, como o `claude-haiku-4-5` |
+| `ASSISTANT_FALLBACKS` | ligado | `off` desliga o fallback do servidor |
+
+### Testes
+
+`src/assistant/assistant.service.spec.ts` simula o modelo e cobre: conversão pedida pelo modelo, várias conversões no mesmo turno, pergunta fora do assunto, erro da conversão devolvido como `is_error`, valor inválido vindo do modelo, recusa, limite de rodadas e falta de chave. Os testes E2E cobrem a proteção por API key e a validação da pergunta.
+
+---
+
 ## 🧪 Testes
 
 ```bash
@@ -249,6 +305,10 @@ src/
 │   ├── dto/                # Data Transfer Objects
 │   ├── services/           # Lógica de negócio
 │   └── conversion.controller.ts
+├── assistant/              # Assistente em linguagem natural (Claude + function calling)
+│   ├── dto/
+│   ├── assistant.service.ts   # Laço de ferramentas e tratamento de erros
+│   └── assistant.controller.ts
 └── health/                 # Health check
 
 test/                       # Testes E2E

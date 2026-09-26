@@ -5,6 +5,7 @@ import { HttpModule } from '@nestjs/axios';
 import { ConversionModule } from './conversion/conversion.module';
 import { AuthModule } from './auth/auth.module';
 import { HealthModule } from './health/health.module';
+import { AssistantModule } from './assistant/assistant.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { HealthModule } from './health/health.module';
     AuthModule,
     ConversionModule,
     HealthModule,
+    AssistantModule,
   ],
 })
 export class AppModule {}

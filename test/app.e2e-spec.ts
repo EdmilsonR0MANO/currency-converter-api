@@ -113,4 +113,20 @@ describe('Currency Converter API (e2e)', () => {
         });
     });
   });
+  describe('Assistant', () => {
+    it('should reject requests without API Key', () => {
+      return request(app.getHttpServer())
+        .post('/api/assistant/ask')
+        .send({ question: 'Quanto dá 10 dólares em reais?' })
+        .expect(401);
+    });
+
+    it('should reject an empty question', () => {
+      return request(app.getHttpServer())
+        .post('/api/assistant/ask')
+        .set('x-api-key', apiKey)
+        .send({ question: '' })
+        .expect(400);
+    });
+  });
 });
