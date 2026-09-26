@@ -13,8 +13,7 @@ export class ApiKeyGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest<Request>();
     const apiKey = this.extractApiKey(request);
-    //localhost:3000/api/conversion/conver
-    http: if (!apiKey) {
+    if (!apiKey) {
       throw new UnauthorizedException({
         statusCode: 401,
         message: 'API Key não fornecida',
