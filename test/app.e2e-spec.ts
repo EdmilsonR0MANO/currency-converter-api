@@ -5,7 +5,10 @@ import { AppModule } from '../src/app.module';
 
 describe('Currency Converter API (e2e)', () => {
   let app: INestApplication;
-  const apiKey = process.env.API_KEY || 'minha-api-key-secreta-123';
+  // O teste define a chave que o guard vai exigir. Antes ele dependia do .env de quem rodava:
+  // num clone limpo o guard usava a chave padrão e 4 testes falhavam com 401.
+  const apiKey = 'e2e-test-api-key';
+  process.env.API_KEY = apiKey;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
